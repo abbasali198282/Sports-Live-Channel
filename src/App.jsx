@@ -3,8 +3,10 @@ import Hls from 'hls.js';
 import {
   Play, Radio, Tv, Search, Plus, Flame,
   Activity, Volume2, VolumeX, Maximize2,
-  X, Sparkles, Lock, Eye, RefreshCw
+  X, Eye, RefreshCw
 } from 'lucide-react';
+import AdSlot from './components/AdSlot.jsx';
+import { fetchChannels, insertChannel } from './lib/channels.js';
 
 const CATEGORIES = [
   'All',
@@ -16,229 +18,7 @@ const CATEGORIES = [
   'Science & Docs'
 ];
 
-const INITIAL_CHANNELS = [
-  // CRICKET CHANNELS
-  {
-    id: 'sw-cricket-hd',
-    name: 'SPORTS WAVE CRICKET HD',
-    category: 'Cricket',
-    badge: 'FREE',
-    quality: '1080p HD',
-    viewers: '248.5K',
-    currentEvent: 'LIVE: Pakistan vs South Africa - Final ODI',
-    league: 'International Cricket',
-    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    poster: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Pakistan vs South Africa - 3rd ODI Live' },
-      { time: '21:00 PKT', title: 'The Pavilion - Post-Match Cricket Analysis' },
-      { time: '22:30 PKT', title: 'PSL 2026 Greatest Finishes' }
-    ]
-  },
-  {
-    id: 'ptv-sports-cricket',
-    name: 'PTV Sports Cricket',
-    category: 'Cricket',
-    badge: 'FREE',
-    quality: '1080p60',
-    viewers: '192.1K',
-    currentEvent: 'LIVE: National T20 Cup & ICC Champions Trophy Preview',
-    league: 'Pakistan Cricket',
-    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    poster: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Game On Hai - Cricket Studio Live' },
-      { time: '20:30 PKT', title: 'Hong Kong Sixes Full Highlights' }
-    ]
-  },
-  {
-    id: 'willow-cricket-4k',
-    name: 'Willow Cricket 4K',
-    category: 'Cricket',
-    badge: 'PRO',
-    quality: '4K 60FPS',
-    viewers: '84.3K',
-    currentEvent: 'AD-FREE: Australia vs India Border-Gavaskar Test Special',
-    league: 'World Test Championship',
-    streamUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    poster: 'https://images.unsplash.com/photo-1593341646782-e0b495cff86d?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Stump Mic 4K Feed: Test Series Live' },
-      { time: '22:00 PKT', title: 'ICC T20 World Cup Classics' }
-    ]
-  },
-
-  // FOOTBALL CHANNELS
-  {
-    id: 'sw-football-ultra',
-    name: 'SPORTS WAVE FOOTBALL 4K',
-    category: 'Football',
-    badge: 'FREE',
-    quality: '4K UHD',
-    viewers: '176.4K',
-    currentEvent: 'LIVE: Real Madrid vs Barcelona - El Clasico Build-Up & Match',
-    league: 'LaLiga & European Football',
-    streamUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    poster: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'European Football Matchday Live' },
-      { time: '22:00 PKT', title: 'Premier League Super Sunday Live' }
-    ]
-  },
-  {
-    id: 'ten-football-hd',
-    name: 'Ten Sports Football HD',
-    category: 'Football',
-    badge: 'PRO',
-    quality: '1080p60',
-    viewers: '112.9K',
-    currentEvent: 'UEFA Champions League: Bayern Munich vs Arsenal',
-    league: 'UEFA Champions League',
-    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    poster: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'UEFA Champions League Kickoff' },
-      { time: '23:45 PKT', title: 'Goals of the Week Show' }
-    ]
-  },
-
-  // HOCKEY CHANNELS
-  {
-    id: 'sw-hockey-hd',
-    name: 'SPORTS WAVE HOCKEY HD',
-    category: 'Hockey',
-    badge: 'FREE',
-    quality: '1080p HD',
-    viewers: '68.7K',
-    currentEvent: 'LIVE: Pakistan vs Netherlands - FIH Pro League 2026',
-    league: 'FIH Field Hockey',
-    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    poster: 'https://images.unsplash.com/photo-1580748141549-71748dbe0bdc?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'FIH Men’s Hockey Pro League: PAK vs NED' },
-      { time: '21:00 PKT', title: 'Sultan Azlan Shah Cup Highlights' }
-    ]
-  },
-  {
-    id: 'euro-hockey-pro',
-    name: 'EuroHockey & NHL Arena',
-    category: 'Hockey',
-    badge: 'PRO',
-    quality: '4K 60FPS',
-    viewers: '41.2K',
-    currentEvent: 'Asian Champions Trophy Hockey Final Replay & Live Turf Cam',
-    league: 'World Hockey Federation',
-    streamUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    poster: 'https://images.unsplash.com/photo-1515703407324-5f753afd8be8?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Asian Champions Trophy: Pakistan vs India' },
-      { time: '22:30 PKT', title: 'Golden Era of Green Shirts Documentary' }
-    ]
-  },
-
-  // CARTOON CHANNELS
-  {
-    id: 'sw-toons-hd',
-    name: 'SPORTS WAVE TOONS HD',
-    category: 'Cartoon',
-    badge: 'FREE',
-    quality: '1080p HD',
-    viewers: '134.0K',
-    currentEvent: 'Big Buck Bunny & Classic Animated Adventures Marathon',
-    league: '24/7 Kids & Animation',
-    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    poster: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Big Buck Bunny Full HD Movie' },
-      { time: '20:00 PKT', title: 'Tom & Jerry Classic Chase Hour' },
-      { time: '21:00 PKT', title: 'Dragon Ball Super Dubbed Marathon' }
-    ]
-  },
-  {
-    id: 'anime-action-4k',
-    name: 'Cartoon & Anime 4K',
-    category: 'Cartoon',
-    badge: 'FREE',
-    quality: '4K HDR',
-    viewers: '95.8K',
-    currentEvent: 'Sintel 4K Fantasy Animation & Sports Anime Block',
-    league: 'Anime & Toons',
-    streamUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    poster: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Sintel 4K Animated Feature' },
-      { time: '21:00 PKT', title: 'Blue Lock & Captain Tsubasa Football Anime' }
-    ]
-  },
-
-  // WILDLIFE & NATURE CHANNELS
-  {
-    id: 'sw-wild-4k',
-    name: 'SPORTS WAVE WILD 4K',
-    category: 'Wildlife & Nature',
-    badge: 'FREE',
-    quality: '4K HDR',
-    viewers: '74.9K',
-    currentEvent: 'Snow Leopards of Gilgit & Karakoram Peaks',
-    league: '4K Earth Expedition',
-    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    poster: 'https://images.unsplash.com/photo-1456926631375-92c8ce872def?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Apex Predators of the Himalayas' },
-      { time: '20:30 PKT', title: 'Deosai Plains: Himalayan Brown Bears' }
-    ]
-  },
-  {
-    id: 'nat-geo-wild',
-    name: 'Nat Geo Wild 4K',
-    category: 'Wildlife & Nature',
-    badge: 'PRO',
-    quality: '4K UHD',
-    viewers: '63.2K',
-    currentEvent: 'Serengeti Lions: Night Hunt in Thermal 4K',
-    league: 'Wildlife Documentary',
-    streamUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    poster: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Serengeti Pride: Survival Instinct' },
-      { time: '21:00 PKT', title: 'Amazon River Giants' }
-    ]
-  },
-
-  // SCIENCE & DOCS CHANNELS
-  {
-    id: 'discovery-science',
-    name: 'Discovery Science HD',
-    category: 'Science & Docs',
-    badge: 'FREE',
-    quality: '1080p HD',
-    viewers: '49.4K',
-    currentEvent: 'How the Universe Works: James Webb Deep Field',
-    league: 'Astrophysics & Tech',
-    streamUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'Exoplanets & Deep Space Telescopes' },
-      { time: '21:30 PKT', title: 'Mega Engineering: High Speed Rail' }
-    ]
-  },
-  {
-    id: 'nasa-uhd',
-    name: 'NASA TV UHD Orbital',
-    category: 'Science & Docs',
-    badge: 'FREE',
-    quality: '4K UHD',
-    viewers: '52.0K',
-    currentEvent: 'Live International Space Station Earth Cam',
-    league: 'Space Telemetry',
-    streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    poster: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1000&q=80',
-    epg: [
-      { time: 'LIVE NOW', title: 'ISS Live External HD Telemetry' },
-      { time: '22:00 PKT', title: 'Artemis Lunar Mission Briefing' }
-    ]
-  }
-];
+const PRE_ROLL_SECONDS = 5;
 
 function HlsVideoPlayer({ streamUrl, poster, channelName }) {
   const videoRef = useRef(null);
@@ -322,16 +102,13 @@ function HlsVideoPlayer({ streamUrl, poster, channelName }) {
 }
 
 export default function App() {
-  const [channels, setChannels] = useState(() => {
-    const saved = localStorage.getItem('sportswave_channels_v2');
-    return saved ? JSON.parse(saved) : INITIAL_CHANNELS;
-  });
+  const [channels, setChannels] = useState([]);
+  const [loadState, setLoadState] = useState('loading');
+  const [loadError, setLoadError] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedChannel, setSelectedChannel] = useState(INITIAL_CHANNELS[0]);
-  const [isProUser, setIsProUser] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState(null);
   const [adCountdown, setAdCountdown] = useState(0);
-  const [showProModal, setShowProModal] = useState(false);
   const [showAddStreamModal, setShowAddStreamModal] = useState(false);
 
   // Live Multi-Sport Ticker State
@@ -341,6 +118,27 @@ export default function App() {
   const [newStreamName, setNewStreamName] = useState('');
   const [newStreamCategory, setNewStreamCategory] = useState('Cricket');
   const [newStreamUrl, setNewStreamUrl] = useState('');
+  const [addError, setAddError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchChannels()
+      .then((list) => {
+        if (cancelled) return;
+        setChannels(list);
+        setSelectedChannel(list[0] ?? null);
+        setLoadState('ready');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setLoadError(err.message);
+        setLoadState('error');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (adCountdown > 0) {
@@ -350,14 +148,8 @@ export default function App() {
   }, [adCountdown]);
 
   const handleSelectChannel = (channel) => {
-    if (channel.badge === 'PRO' && !isProUser) {
-      setShowProModal(true);
-      return;
-    }
     setSelectedChannel(channel);
-    if (!isProUser) {
-      setAdCountdown(5);
-    }
+    setAdCountdown(PRE_ROLL_SECONDS);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -384,29 +176,32 @@ export default function App() {
     });
   };
 
-  const handleAddStream = (e) => {
+  const openAddStreamModal = () => {
+    setAddError('');
+    setShowAddStreamModal(true);
+  };
+
+  const handleAddStream = async (e) => {
     e.preventDefault();
-    if (!newStreamName.trim() || !newStreamUrl.trim()) return;
-    const created = {
-      id: 'custom-' + Date.now(),
-      name: newStreamName.trim(),
-      category: newStreamCategory,
-      badge: 'FREE',
-      quality: 'CUSTOM HLS',
-      viewers: 'LIVE',
-      currentEvent: `Live ${newStreamCategory} Broadcast`,
-      league: newStreamCategory,
-      streamUrl: newStreamUrl.trim(),
-      poster: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1000&q=80',
-      epg: [{ time: 'LIVE NOW', title: newStreamName.trim() }]
-    };
-    const updated = [created, ...channels];
-    setChannels(updated);
-    localStorage.setItem('sportswave_channels_v2', JSON.stringify(updated));
-    setSelectedChannel(created);
-    setNewStreamName('');
-    setNewStreamUrl('');
-    setShowAddStreamModal(false);
+    if (!newStreamName.trim() || !newStreamUrl.trim() || isSaving) return;
+    setIsSaving(true);
+    setAddError('');
+    try {
+      const created = await insertChannel({
+        name: newStreamName.trim(),
+        category: newStreamCategory,
+        streamUrl: newStreamUrl.trim(),
+      });
+      setChannels((prev) => [created, ...prev]);
+      setSelectedChannel(created);
+      setNewStreamName('');
+      setNewStreamUrl('');
+      setShowAddStreamModal(false);
+    } catch (err) {
+      setAddError(err.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const filteredChannels = channels.filter((ch) => {
@@ -417,6 +212,13 @@ export default function App() {
       ch.currentEvent.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCat && matchesSearch;
   });
+
+  const playerMessage =
+    loadState === 'loading'
+      ? 'Loading channels...'
+      : loadState === 'error'
+        ? `Could not load channels: ${loadError}`
+        : 'No channels yet. Add a stream to start watching.';
 
   return (
     <div className="min-h-screen bg-[#070b12] text-slate-100 font-sans selection:bg-emerald-500 selection:text-black">
@@ -432,13 +234,6 @@ export default function App() {
             </span>
             <span className="text-emerald-400 font-medium hidden sm:inline">
               ({score.lastBall})
-            </span>
-            <span className="text-slate-600 hidden md:inline">|</span>
-            <span className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold px-2 py-0.5 rounded hidden md:inline">
-              FOOTBALL: RMA 2 - 1 BAR (78&apos;)
-            </span>
-            <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold px-2 py-0.5 rounded hidden lg:inline">
-              HOCKEY: PAK 3 - 2 NED (Q4)
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -490,22 +285,10 @@ export default function App() {
               </div>
 
               <button
-                onClick={() => setShowAddStreamModal(true)}
+                onClick={openAddStreamModal}
                 className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer"
               >
                 <Plus className="w-4 h-4" /> + Add .m3u8
-              </button>
-
-              <button
-                onClick={() => setIsProUser(!isProUser)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                  isProUser
-                    ? 'bg-amber-400 text-slate-950 shadow-lg shadow-amber-400/20'
-                    : 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                {isProUser ? 'PRO ACTIVE' : 'GO PRO'}
               </button>
             </div>
           </div>
@@ -535,65 +318,60 @@ export default function App() {
           {/* Left 2 Columns: Active Video Stream Player */}
           <div className="lg:col-span-2 space-y-4">
             <div className="relative">
-              <HlsVideoPlayer
-                streamUrl={selectedChannel.streamUrl}
-                poster={selectedChannel.poster}
-                channelName={selectedChannel.name}
-              />
+              {selectedChannel ? (
+                <HlsVideoPlayer
+                  streamUrl={selectedChannel.streamUrl}
+                  poster={selectedChannel.poster}
+                  channelName={selectedChannel.name}
+                />
+              ) : (
+                <div className="w-full aspect-video bg-slate-950 rounded-2xl border border-white/10 flex items-center justify-center p-6 text-center text-sm text-slate-400">
+                  {playerMessage}
+                </div>
+              )}
 
-              {/* Pre-Roll Sponsor Ad Simulation for Free Users */}
-              {adCountdown > 0 && !isProUser && (
-                <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-6 text-center z-20">
-                  <span className="bg-amber-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full mb-3">
-                    SPORTS WAVE SPONSOR PRE-ROLL • {adCountdown}s
+              {/* Pre-roll ad shown after switching channels */}
+              {adCountdown > 0 && selectedChannel && (
+                <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-6 text-center z-20 space-y-4">
+                  <span className="bg-amber-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full">
+                    ADVERTISEMENT • {adCountdown}s
                   </span>
-                  <h3 className="text-xl font-extrabold text-white mb-2">
-                    Upgrade to SPORTS WAVE PRO for Instant Zero-Ad 4K 60FPS Streams
-                  </h3>
-                  <p className="text-xs text-slate-400 max-w-md mb-5">
-                    Your live stream of <span className="text-emerald-400 font-semibold">{selectedChannel.name}</span> will start in {adCountdown} seconds.
+                  <AdSlot size="video" className="max-w-sm" />
+                  <p className="text-xs text-slate-400 max-w-md">
+                    Your stream of <span className="text-emerald-400 font-semibold">{selectedChannel.name}</span> will start in {adCountdown} seconds.
                   </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => {
-                        setIsProUser(true);
-                        setAdCountdown(0);
-                      }}
-                      className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs transition cursor-pointer"
-                    >
-                      Unlock Ad-Free PRO Now
-                    </button>
-                    <button
-                      onClick={() => setAdCountdown(0)}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs transition cursor-pointer"
-                    >
-                      Skip Demo Ad
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setAdCountdown(0)}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs transition cursor-pointer"
+                  >
+                    Skip ad
+                  </button>
                 </div>
               )}
             </div>
 
             {/* Active Stream Metadata Bar */}
-            <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <span className="text-lg font-black text-white">{selectedChannel.name}</span>
-                  <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-md font-bold">
-                    {selectedChannel.quality}
-                  </span>
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <Eye className="w-3.5 h-3.5 text-emerald-400" /> {selectedChannel.viewers} watching
+            {selectedChannel && (
+              <div className="bg-slate-900/70 border border-white/10 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-lg font-black text-white">{selectedChannel.name}</span>
+                    <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-md font-bold">
+                      {selectedChannel.quality}
+                    </span>
+                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                      <Eye className="w-3.5 h-3.5 text-emerald-400" /> {selectedChannel.viewers} watching
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-300 mt-1 font-medium">{selectedChannel.currentEvent}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-white/10">
+                    Category: <strong className="text-emerald-400">{selectedChannel.category}</strong>
                   </span>
                 </div>
-                <p className="text-sm text-slate-300 mt-1 font-medium">{selectedChannel.currentEvent}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-xl border border-white/10">
-                  Category: <strong className="text-emerald-400">{selectedChannel.category}</strong>
-                </span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Right Column: Live Channel EPG & Quick Switcher */}
@@ -606,23 +384,18 @@ export default function App() {
                     Live Schedule (EPG)
                   </h2>
                 </div>
-                <span className="text-[11px] text-emerald-400 font-bold">{selectedChannel.category}</span>
+                {selectedChannel && (
+                  <span className="text-[11px] text-emerald-400 font-bold">{selectedChannel.category}</span>
+                )}
               </div>
 
               <div className="space-y-2 mb-5">
-                {selectedChannel.epg?.map((slot, i) => (
-                  <div
-                    key={i}
-                    className={`p-3 rounded-xl border ${
-                      i === 0
-                        ? 'bg-emerald-500/10 border-emerald-500/40 text-white'
-                        : 'bg-slate-950/60 border-white/5 text-slate-400'
-                    }`}
-                  >
-                    <div className="text-[11px] font-bold text-emerald-400">{slot.time}</div>
-                    <div className="text-xs font-semibold mt-0.5">{slot.title}</div>
+                {selectedChannel && (
+                  <div className="p-3 rounded-xl border bg-emerald-500/10 border-emerald-500/40 text-white">
+                    <div className="text-[11px] font-bold text-emerald-400">LIVE NOW</div>
+                    <div className="text-xs font-semibold mt-0.5">{selectedChannel.currentEvent}</div>
                   </div>
-                ))}
+                )}
               </div>
 
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">
@@ -634,7 +407,7 @@ export default function App() {
                     key={ch.id}
                     onClick={() => handleSelectChannel(ch)}
                     className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                      selectedChannel.id === ch.id
+                      selectedChannel?.id === ch.id
                         ? 'bg-emerald-500/20 border-emerald-500 text-white'
                         : 'bg-slate-950/60 border-white/5 text-slate-300 hover:bg-white/5'
                     }`}
@@ -655,7 +428,7 @@ export default function App() {
             <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-3 text-xs text-emerald-200 flex items-center justify-between">
               <span>Have a custom .m3u8 stream?</span>
               <button
-                onClick={() => setShowAddStreamModal(true)}
+                onClick={openAddStreamModal}
                 className="text-emerald-400 font-black underline cursor-pointer"
               >
                 Add Channel
@@ -663,6 +436,8 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        <AdSlot size="banner" />
 
         {/* Filtered Channels Grid */}
         <section className="space-y-4">
@@ -682,7 +457,7 @@ export default function App() {
                 key={channel.id}
                 onClick={() => handleSelectChannel(channel)}
                 className={`group bg-slate-900/80 rounded-2xl overflow-hidden border transition cursor-pointer hover:-translate-y-1 ${
-                  selectedChannel.id === channel.id
+                  selectedChannel?.id === channel.id
                     ? 'border-emerald-500 ring-2 ring-emerald-500/30'
                     : 'border-white/10 hover:border-emerald-500/50'
                 }`}
@@ -703,15 +478,9 @@ export default function App() {
                     </span>
                   </div>
                   <div className="absolute top-2.5 right-2.5">
-                    {channel.badge === 'PRO' ? (
-                      <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded flex items-center gap-1">
-                        <Lock className="w-2.5 h-2.5" /> PRO
-                      </span>
-                    ) : (
-                      <span className="bg-emerald-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded">
-                        FREE
-                      </span>
-                    )}
+                    <span className="bg-emerald-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded">
+                      FREE
+                    </span>
                   </div>
                   <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between">
                     <span className="text-xs font-black text-white drop-shadow">{channel.name}</span>
@@ -731,37 +500,6 @@ export default function App() {
           </div>
         </section>
       </main>
-
-      {/* PRO Upgrade Modal */}
-      {showProModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-amber-400/40 rounded-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="bg-amber-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full">
-                SPORTS WAVE PRO 4K PASS
-              </span>
-              <button onClick={() => setShowProModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <h3 className="text-xl font-black text-white">
-              Unlock All 4K Cricket, Football, Hockey, Cartoon & Wildlife Channels
-            </h3>
-            <p className="text-xs text-slate-300">
-              Get instant access to <strong>Willow Cricket 4K</strong>, <strong>Ten Sports Football HD</strong>, <strong>EuroHockey Arena</strong>, and <strong>Nat Geo Wild 4K</strong> with zero ads.
-            </p>
-            <button
-              onClick={() => {
-                setIsProUser(true);
-                setShowProModal(false);
-              }}
-              className="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-3 rounded-xl text-sm cursor-pointer"
-            >
-              Activate Free Demo PRO Pass Now
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Custom .m3u8 Stream Modal */}
       {showAddStreamModal && (
@@ -785,7 +523,7 @@ export default function App() {
               <input
                 type="text"
                 required
-                placeholder="e.g., Cartoon Network HD or A Sports"
+                placeholder="e.g., My Live Channel"
                 value={newStreamName}
                 onChange={(e) => setNewStreamName(e.target.value)}
                 className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white"
@@ -817,11 +555,15 @@ export default function App() {
                 className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white"
               />
             </div>
+            {addError && (
+              <p className="text-xs text-red-400">Could not save channel: {addError}</p>
+            )}
             <button
               type="submit"
-              className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2.5 rounded-xl text-xs cursor-pointer"
+              disabled={isSaving}
+              className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-black py-2.5 rounded-xl text-xs cursor-pointer"
             >
-              Save & Watch Live
+              {isSaving ? 'Saving...' : 'Save & Watch Live'}
             </button>
           </form>
         </div>
