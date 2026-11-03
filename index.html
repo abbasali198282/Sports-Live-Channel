@@ -1,16 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sports-live-channel</title>
-    <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sports Wave — Live cricket, hockey, wildlife &amp; cartoons</title>
+  <meta name="description" content="Sports Wave is a channel guide for cricket, hockey, wildlife and cartoon broadcasters. Browse real channels, save a watchlist and open an authorised stream source.">
+  <meta name="theme-color" content="#0b0f14">
+  <meta property="og:title" content="Sports Wave — Live sport, nature and family channels">
+  <meta property="og:description" content="Browse real cricket, hockey, wildlife and cartoon channels in one clean guide.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#app">Skip to content</a>
+
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a class="brand" href="#/" aria-label="Sports Wave home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44" fill="none" role="img">
+            <rect width="44" height="44" rx="12" fill="url(#swGrad)"/>
+            <path d="M7 27c5.5 0 5.5-9 11-9s5.5 9 11 9 5.5-9 8-9" stroke="#04110c" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M7 34c5.5 0 5.5-6 11-6s5.5 6 11 6 5.5-6 8-6" stroke="#04110c" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+            <defs>
+              <linearGradient id="swGrad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#34e8b0"/>
+                <stop offset="1" stop-color="#2bb8ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>Sports<span>Wave</span></strong>
+          <small>Live channel guide</small>
+        </span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Primary">
+        <a href="#/" data-nav="home">Home</a>
+        <a href="#/live-tv" data-nav="live-tv">Live TV</a>
+        <a href="#/category/cricket" data-nav="cricket">Cricket</a>
+        <a href="#/category/hockey" data-nav="hockey">Hockey</a>
+        <a href="#/category/wildlife" data-nav="wildlife">Wildlife</a>
+        <a href="#/category/cartoons" data-nav="cartoons">Cartoons</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" type="button" id="searchBtn" aria-label="Search channels" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+        </button>
+        <a class="watchlist-btn" href="#/watchlist" aria-label="Open watchlist">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.9.9-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.8l5.9-.9z"/></svg>
+          <span class="watchlist-label">Watchlist</span>
+          <span class="count" id="watchCount" data-count="0">0</span>
+        </a>
+        <button class="icon-btn menu-btn" type="button" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu" hidden>
+      <nav aria-label="Mobile">
+        <a href="#/" data-nav="home">Home</a>
+        <a href="#/live-tv" data-nav="live-tv">Live TV</a>
+        <a href="#/category/cricket" data-nav="cricket">Cricket</a>
+        <a href="#/category/hockey" data-nav="hockey">Hockey</a>
+        <a href="#/category/wildlife" data-nav="wildlife">Wildlife &amp; Nature</a>
+        <a href="#/category/cartoons" data-nav="cartoons">Cartoons</a>
+        <a href="#/watchlist" data-nav="watchlist">My watchlist</a>
+        <a href="#/studio" data-nav="studio">Stream studio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a class="brand" href="#/" aria-label="Sports Wave home">
+            <span class="brand-mark brand-mark--sm" aria-hidden="true">
+              <svg viewBox="0 0 44 44" fill="none">
+                <rect width="44" height="44" rx="12" fill="url(#swGradF)"/>
+                <path d="M7 27c5.5 0 5.5-9 11-9s5.5 9 11 9 5.5-9 8-9" stroke="#04110c" stroke-width="3.2" stroke-linecap="round"/>
+                <path d="M7 34c5.5 0 5.5-6 11-6s5.5 6 11 6 5.5-6 8-6" stroke="#04110c" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+                <defs>
+                  <linearGradient id="swGradF" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#34e8b0"/><stop offset="1" stop-color="#2bb8ff"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </span>
+            <span class="brand-text"><strong>Sports<span>Wave</span></strong></span>
+          </a>
+          <p>A cleaner way to find live sport, nature and family channels. Real broadcasters, honest listings, no clutter.</p>
+        </div>
+
+        <div class="footer-col">
+          <h2>Browse</h2>
+          <a href="#/live-tv">All channels</a>
+          <a href="#/category/cricket">Cricket</a>
+          <a href="#/category/hockey">Hockey</a>
+          <a href="#/category/wildlife">Wildlife &amp; Nature</a>
+          <a href="#/category/cartoons">Cartoons</a>
+        </div>
+
+        <div class="footer-col">
+          <h2>Your space</h2>
+          <a href="#/watchlist">Watchlist</a>
+          <a href="#/studio">Stream studio</a>
+          <a href="#/about">About Sports Wave</a>
+          <a href="#/terms">Terms of use</a>
+          <a href="#/privacy">Privacy</a>
+        </div>
+
+        <div class="footer-col footer-note">
+          <h2>Broadcast rights</h2>
+          <p>Sports Wave is a channel directory. It does not host or rebroadcast television. Playback only works when an authorised source is added by the site owner or by you.</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© <span id="year">2026</span> Sports Wave. Channel names and marks belong to their respective owners.</p>
+        <p class="footer-status"><span class="dot"></span> Channel guide online</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Search overlay -->
+  <div class="search-overlay" id="searchOverlay" hidden>
+    <div class="search-panel" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+      <div class="search-head">
+        <h2 id="searchTitle" class="sr-only">Search channels</h2>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+        <input type="search" id="searchInput" placeholder="Search channels, categories, countries…" autocomplete="off" spellcheck="false">
+        <button class="icon-btn" id="searchClose" type="button" aria-label="Close search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <p class="search-hint">Try “cricket”, “wildlife”, “Sky” or a country.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/streams.js"></script>
+  <script src="assets/js/hls.min.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
 </html>
